@@ -106,3 +106,82 @@ Lỗi 9:Dòng 45 - Thẻ <p> trong Footer thiếu thẻ đóng — Sửa thành:
 
 Lỗi 10: Dòng 48 — Thiếu thẻ đóng </html> — Thêm </html> vào cuối bài.
 
+Câu C1:
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết sản phẩm</title>
+</head>
+<body>
+
+<!-- Header + Navigation: chứa logo và menu -->
+<header>
+    <nav>
+        <!-- menu điều hướng -->
+    </nav>
+</header>
+
+<!-- Breadcrumb: giúp người dùng biết đang ở đâu -->
+<nav aria-label="breadcrumb">
+    <ol>
+        <li><a href="#">Trang chủ</a></li>
+        <li><a href="#">Điện thoại</a></li>
+        <li>iPhone 16</li>
+    </ol>
+</nav>
+
+<main>
+    <!-- Khu chính của trang -->
+    <section>
+        
+        <!-- Ảnh sản phẩm: dùng figure để nhóm ảnh -->
+        <div class="product-images">
+            <figure></figure>
+            <figure></figure>
+            <figure></figure>
+            <figure></figure>
+            <figure></figure>
+        </div>
+
+        <!-- Thông tin sản phẩm -->
+        <article>
+            <h1>Tên sản phẩm</h1> <!-- tiêu đề chính -->
+            <p class="price">Giá</p> <!-- giá -->
+            <p class="rating">Đánh giá</p> <!-- sao -->
+            <p class="description">Mô tả</p> <!-- mô tả -->
+        </article>
+
+        <!-- Thông số kỹ thuật: dùng table vì dữ liệu dạng bảng -->
+        <section>
+            <h2>Thông số kỹ thuật</h2>
+            <table>
+                <tr>
+                    <th>Thuộc tính</th>
+                    <th>Giá trị</th>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Đánh giá / bình luận -->
+        <section>
+            <h2>Bình luận</h2>
+            <article></article> <!-- mỗi comment là 1 article -->
+        </section>
+
+    </section>
+
+    <!-- Sidebar: sản phẩm tương tự -->
+    <aside>
+        <h3>Sản phẩm tương tự</h3>
+    </aside>
+
+</main>
+
+<!-- Footer -->
+<footer>
+    <p>Thông tin website</p>
+</footer>
+
+</body>
+</html>
