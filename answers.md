@@ -106,6 +106,34 @@ Lỗi 9:Dòng 45 - Thẻ <p> trong Footer thiếu thẻ đóng — Sửa thành:
 
 Lỗi 10: Dòng 48 — Thiếu thẻ đóng </html> — Thêm </html> vào cuối bài.
 
+Bài B4:
+yêu cầu 1: ảnh: ![Phân tích Semantic](./screenshots/semantic.JPG)
+- 3 thẻ sematic HTML5 mà trang đó sử dụng:
+
+Thẻ <header>:
+Vị trí: Nằm ngay đầu dưới thẻ <body>.
+
+Thẻ <nav>:
+Vị trí: Nằm bên trong thẻ div có class navbar-wrapper.
+
+Thẻ <footer>:
+Vị trí: Nằm ở cuối cấu trúc, dưới thẻ div chứa nội dung chính.
+
+- 2 thẻ KHÔNG dùng đúng Semantic:
+Sử dụng thẻ <div> thay cho <main>
+Sử dụng thẻ <div> bao bọc bên ngoài <nav>
+
+yêu cầu 2: ảnh: ![Phân tích table](./screenshots/table.JPG)
+Nội dung hiển thị: * Bảng này dùng để hiển thị thông báo hệ thống (Site Notice) hoặc các biểu ngữ (Banner) quan trọng của trang web
+-Không sử dụng <thead> và <tbody>
+
+yêu cầu 3 ảnh:![Phân tích form](./screenshots/form.JPG)
+-Form sử dụng:
+action: /tim-kiem
+method: mặc định là GET (vì không khai báo)
+-input type được sủ dụng là: input type="text" 
+
+*Phần C:
 Câu C1:
 <!DOCTYPE html>
 <html lang="vi">
@@ -185,3 +213,13 @@ Câu C1:
 
 </body>
 </html>
+
+Câu C2:
+Việc lạm dụng <div> cho mọi thứ có vẻ nhanh gọn, nhưng đó là tư duy thiếu chuyên nghiệp, gây hại cho sản phẩm về lâu dài.
+
+-Thứ nhất, về SEO (Tối ưu hóa công cụ tìm kiếm), các con bot của Google dựa vào thẻ semantic để hiểu cấu trúc và tầm quan trọng của nội dung. Nếu chỉ dùng <div>, trang web trở thành một "khối hộp vô danh", khiến nội dung khó được xếp hạng cao.
+-Thứ hai là Accessibility (Khả năng tiếp cận). Những người khiếm thị sử dụng trình đọc màn hình (Screen Reader) sẽ không thể điều hướng nhanh đến menu hay nội dung chính nếu thiếu các thẻ như <nav> hoặc <main>. Một trang web toàn <div> giống như một cuốn sách không có mục lục hay tiêu đề chương.
+
+Ví dụ cụ thể: Khi bọc một sản phẩm trong thẻ <article>, trình duyệt và máy tìm kiếm hiểu ngay đó là một thực thể nội dung độc lập, có thể chia sẻ hoặc tái sử dụng. Nếu dùng <div>, ý nghĩa này hoàn toàn biến mất.
+
+Tuy nhiên, <div> vẫn phù hợp nhất trong các trường hợp cần một container trung tính để phục vụ mục đích Styling (CSS) hoặc làm các lớp bọc (wrappers) để dàn trang mà không mang ý nghĩa về mặt nội dung.
