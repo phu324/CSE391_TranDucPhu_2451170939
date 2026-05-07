@@ -115,3 +115,72 @@ Ví dụ thực tế:
 -Ảnh thẻ sản phẩm: Hiển thị ảnh điện thoại kèm theo tên và giá tiền ngay bên dưới (như ví dụ iPhone 16 trong đề bài).
 -Biểu đồ số liệu: Một biểu đồ tăng trưởng doanh thu cần đoạn văn bản bên dưới để giải thích các cột thông số đó nói lên điều gì.
 
+Phần B:
+bài B1:
+HTML không thể validate confirm password vì: HTML5 chỉ có khả năng kiểm tra giá trị của từng ô nhập liệu độc lập dựa trên các thuộc tính có sẵn (như required, pattern). HTML không có cơ chế "so sánh" (logic so sánh) giữa hai ô input khác nhau. Nó không thể tự hiểu rằng giá trị ở ô "Xác nhận" phải khớp hoàn toàn với ô "Mật khẩu".
+
+Phần C:
+Câu C1:
+Lỗi 1: Dòng 2 — Input "Tên" không có <label for="..."> và id, vi phạm tính tiếp cận (accessibility).
+Sửa: <label for="fullname">Tên:</label> <input type="text" id="fullname" name="fullname" required>
+
+Lỗi 2: Dòng 4 — Input "Email" không có nhãn (label) và thiếu thuộc tính required.
+Sửa: <label for="email">Email:</label> <input type="email" id="email" name="email" required placeholder="Email của bạn">
+
+Lỗi 3: Dòng 6 & 7 — Các ô mật khẩu thiếu thuộc tính name và required, dẫn đến không gửi được dữ liệu và không bắt buộc nhập.
+Sửa: <input type="password" id="pass" name="pass" required minlength="8" placeholder="Mật khẩu">
+<input type="password" id="confirm-pass" name="confirm_pass" required placeholder="Nhập lại mật khẩu">
+
+Lỗi 4: Dòng 9 — Input "Phone" đang dùng type="text", sai mục đích sử dụng và thiếu kiểm tra định dạng.
+Sửa: <label for="phone">Phone:</label> <input type="tel" id="phone" name="phone" pattern="[0-9]{10}">
+
+Lỗi 5: Dòng 11 — Thẻ <select> thiếu thuộc tính name và id để định danh dữ liệu khi gửi đi.
+Sửa: <label for="city">Thành phố:</label> <select id="city" name="city">
+
+Lỗi 6: Dòng 12 & 13 — Các thẻ <option> thiếu thuộc tính value, khiến server không nhận được giá trị cụ thể.
+Sửa: <option value="hn">Hà Nội</option> <option value="hcm">TP.HCM</option>
+
+Lỗi 7: Dòng 16 — Phần điều khoản chỉ có thẻ <label> mà thiếu mất ô chọn <input type="checkbox">.
+Sửa: <input type="checkbox" id="agree" name="agree" required> <label for="agree">Tôi đồng ý điều khoản</label>
+
+Lỗi 8: Dòng 1 — Thẻ <form> thiếu thuộc tính action và method, không xác định được nơi gửi và phương thức gửi dữ liệu.
+Sửa: <form action="#" method="POST">
+
+Câu C2:
+1. Viết Pattern Regex
+Bạn sử dụng thuộc tính pattern để kiểm tra định dạng dữ liệu đầu vào:
+
+CMND/CCCD (Đúng 12 chữ số):
+pattern="[0-9]{12}"
+
+Số tài khoản (Từ 10 đến 15 chữ số):
+pattern="[0-9]{10,15}"
+
+Mã PIN (6 chữ số, ẩn nội dung):
+<input type="password" pattern="[0-9]{6}" maxlength="6" required>
+
+2. HTML5 validation chưa đủ an toàn cho ngân hàng vì:
+
+HTML5 validation thực chất chỉ diễn ra ở phía Client (Trình duyệt). Nó phục vụ mục đích chính là cải thiện trải nghiệm người dùng (UX) để họ sửa lỗi ngay lập tức. Tuy nhiên, bất kỳ ai cũng có thể vượt qua lớp bảo vệ này bằng cách:
+
+Dùng "Inspect Element" (F12) để xóa bỏ thuộc tính required hoặc pattern.
+
+Tắt JavaScript của trình duyệt.
+
+Sử dụng các công cụ như Postman hoặc cURL để gửi dữ liệu trực tiếp lên máy chủ mà không thông qua trình duyệt.
+
+3. 3 loại validation mà HTML5 KHÔNG THỂ làm được
+Để thực hiện các kiểm tra này, bạn bắt buộc phải dùng JavaScript:
+
+So sánh giữa 2 trường dữ liệu: Ví dụ kiểm tra "Xác nhận mật khẩu" có trùng khớp với "Mật khẩu" hay không.
+
+Kiểm tra tính duy nhất (Asynchronous Validation): Ví dụ kiểm tra xem Email hoặc Số điện thoại đã tồn tại trong cơ sở dữ liệu của ngân hàng chưa (cần gọi API).
+
+Logic điều kiện phức tạp: Ví dụ: "Nếu chọn phương thức nhận mã OTP qua SMS thì mới yêu cầu nhập Số điện thoại, nếu nhận qua Email thì không bắt buộc".
+
+4. 2 rủi ro bảo mật nếu chỉ validate trên Frontend
+Nếu bạn "bỏ quên" việc kiểm tra ở Backend (máy chủ), ngân hàng sẽ đối mặt với:
+
+Lỗi toàn vẹn dữ liệu (Data Integrity): Kẻ xấu có thể gửi dữ liệu rác, dữ liệu sai định dạng (ví dụ Số tài khoản chứa chữ cái) vào cơ sở dữ liệu, gây hỏng hệ thống hoặc lỗi khi thực hiện các phép tính toán tài chính.
+
+Tấn công chiếm quyền hoặc tiêm mã độc (Injection Attacks): Nếu không validate ở Backend, kẻ tấn công có thể chèn các đoạn mã độc (SQL Injection) vào form để đánh cắp thông tin khách hàng, thay đổi số dư tài khoản hoặc phá hủy dữ liệu của ngân hàng.
