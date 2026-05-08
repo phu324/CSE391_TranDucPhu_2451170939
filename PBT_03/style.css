@@ -1,0 +1,126 @@
+/* 1. Box-sizing reset - Dòng quan trọng nhất */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* 2. Body: Typography và Background */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #f0f2f5; /* Màu nền xám nhạt */
+    color: #1c1e21;           /* Màu chữ xanh đen đậm */
+    line-height: 1.6;
+}
+
+/* 3. Wrapper: Căn giữa trang */
+#wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* 4. Header: Gradient và Padding */
+header {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+/* 5. Navigation & Links */
+nav ul {
+    list-style: none;
+    margin-top: 15px;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav a {
+    text-decoration: none; /* Mặc định không gạch chân */
+    color: #cbd5e1;       /* Màu nhạt hơn màu nền header */
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+/* Hover state */
+nav a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+/* Active state */
+nav a.active {
+    color: white;
+    border-bottom: 2px solid white;
+    padding-bottom: 5px;
+}
+
+/* 6. Main sections */
+main {
+    padding: 20px 40px;
+}
+
+section {
+    margin-bottom: 30px;
+}
+
+h2 {
+    border-left: 5px solid #1e3c72;
+    padding-left: 10px;
+    margin-bottom: 20px;
+    color: #1e3c72;
+}
+
+/* 7. Table Skills Styling */
+table {
+    width: 100%;
+    border-collapse: collapse; /* Gộp border */
+    margin-top: 15px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #dee2e6;
+}
+
+/* Header row đậm */
+thead tr {
+    background-color: #1e3c72;
+    color: white;
+}
+
+/* Zebra striping - Dòng chẵn đổi màu */
+tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+/* Hover row */
+tbody tr:hover {
+    background-color: #e9ecef;
+}
+
+/* Footer bảng */
+tfoot td {
+    font-style: italic;
+    font-size: 0.9em;
+    color: #6c757d;
+}
+
+/* 8. Aside & Footer */
+aside {
+    padding: 20px 40px;
+    background: #f8fafc;
+}
+
+footer {
+    background-color: #1e3c72;
+    color: #cbd5e1; /* Text nhạt */
+    text-align: center;
+    padding: 20px;
+}
