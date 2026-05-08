@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Box Model Lab - Trần Đức Phú</title>
+    <link rel="stylesheet" href="boxmodel.css">
+</head>
+<body>
+
+    <h1>Phần 1: content-box vs border-box</h1>
+    <div class="demo-box-container">
+        <div class="box-1">Hộp 1: content-box</div>
+        <div class="box-2">Hộp 2: border-box</div>
+    </div>
+
+    <hr>
+
+    <h1>Phần 2: Layout 3 cột (Container 1000px)</h1>
+    <!-- Case 1: Border-box (Hoạt động tốt) -->
+    <h2>Trường hợp 1: Sử dụng border-box (Vừa khít)</h2>
+    <div class="container container-fixed">
+        <div class="sidebar-left">Sidebar (250px)</div>
+        <div class="content-mid">Content (500px)</div>
+        <div class="sidebar-right">Ads (250px)</div>
+    </div>
+
+    <!-- Case 2: Content-box (Bị vỡ layout) -->
+    <h2>Trường hợp 2: Mặc định content-box (Bị vỡ/đẩy dòng)</h2>
+    <div class="container container-broken">
+        <div class="sidebar-left">Sidebar</div>
+        <div class="content-mid">Content</div>
+        <div class="sidebar-right">Ads</div>
+    </div>
+
+</body>
+</html>
