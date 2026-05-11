@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Positioning Playground</title>
+    <link rel="stylesheet" href="positioning.css">
+</head>
+<body>
+
+    <!-- Fixed Header -->
+    <header class="header">
+        <div class="logo">MY LOGO</div>
+        <nav class="nav">
+            <a href="#">Trang chủ</a>
+            <a href="#">Sản phẩm</a>
+            <a href="#">Liên hệ</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Sticky Sidebar -->
+        <aside class="sidebar">
+            <h3>Danh mục</h3>
+            <ul>
+                <li>Điện thoại</li>
+                <li>Máy tính bảng</li>
+                <li>Laptop</li>
+                <li>Phụ kiện</li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <h1>Danh sách sản phẩm</h1>
+            <div class="product-grid">
+                <!-- Product Card 1 -->
+                <div class="product-card">
+                    <div class="badge-hot">HOT</div>
+                    <div class="product-img"></div>
+                    <p>Sản phẩm đặc biệt 01</p>
+                    <p><strong>1.200.000đ</strong></p>
+                </div>
+
+                <!-- Product Card 2 (Lặp lại để tạo scroll) -->
+                <div class="product-card">
+                    <div class="badge-hot">HOT</div>
+                    <div class="product-img"></div>
+                    <p>Sản phẩm đặc biệt 02</p>
+                    <p><strong>2.500.000đ</strong></p>
+                </div>
+                
+                <!-- Thêm nhiều card để có thể cuộn trang -->
+                <div class="product-card"><div class="product-img"></div><p>Sản phẩm mẫu</p></div>
+                <div class="product-card"><div class="product-img"></div><p>Sản phẩm mẫu</p></div>
+                <div class="product-card"><div class="product-img"></div><p>Sản phẩm mẫu</p></div>
+                <div class="product-card"><div class="product-img"></div><p>Sản phẩm mẫu</p></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Fixed Scroll to Top Button -->
+    <button class="scroll-top-btn">↑</button>
+
+</body>
+</html>
