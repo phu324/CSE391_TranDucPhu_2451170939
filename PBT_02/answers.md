@@ -184,3 +184,6 @@ Nếu bạn "bỏ quên" việc kiểm tra ở Backend (máy chủ), ngân hàng
 Lỗi toàn vẹn dữ liệu (Data Integrity): Kẻ xấu có thể gửi dữ liệu rác, dữ liệu sai định dạng (ví dụ Số tài khoản chứa chữ cái) vào cơ sở dữ liệu, gây hỏng hệ thống hoặc lỗi khi thực hiện các phép tính toán tài chính.
 
 Tấn công chiếm quyền hoặc tiêm mã độc (Injection Attacks): Nếu không validate ở Backend, kẻ tấn công có thể chèn các đoạn mã độc (SQL Injection) vào form để đánh cắp thông tin khách hàng, thay đổi số dư tài khoản hoặc phá hủy dữ liệu của ngân hàng.
+
+Phần D: video code
+link video: [watch  Video](https://drive.google.com/file/d/1FuGEUkbv0yzdO2H4Zg1VFymvH--VYqtu/view?usp=sharing)
