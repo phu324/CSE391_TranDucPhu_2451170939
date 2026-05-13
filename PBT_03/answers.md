@@ -259,3 +259,6 @@ CSS sửa
 .content {
     width: 598px;
 }
+
+Phần D: video code
+[video code](https://drive.google.com/file/d/1LjU2J_x6WqF26sqD94hB6eRhlvEbWSu9/view?usp=sharing)
