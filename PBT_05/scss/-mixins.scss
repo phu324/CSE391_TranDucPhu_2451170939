@@ -1,0 +1,23 @@
+// Mixin 1: Căn chỉnh Flexbox nhanh gọn
+@mixin flex-layout($justify: flex-start, $align: center, $direction: row) {
+    display: flex;
+    flex-direction: $direction;
+    justify-content: $justify;
+    align-items: $align;
+}
+
+// Mixin 2: Định cấu hình nhanh cho Grid Layout
+@mixin grid-layout($columns: 1fr, $gap: $spacing-md) {
+    display: grid;
+    grid-template-columns: $columns;
+    gap: $gap;
+}
+
+// Mixin 3: Truy vấn thiết bị tự động (Responsive)
+@mixin respond-to($breakpoint) {
+    @if $breakpoint == "tablet" {
+        @media (min-width: $breakpoint-tablet) { @content; }
+    } @else if $breakpoint == "desktop" {
+        @media (min-width: $breakpoint-desktop) { @content; }
+    }
+}

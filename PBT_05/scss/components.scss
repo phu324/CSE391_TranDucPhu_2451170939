@@ -1,0 +1,112 @@
+// Toàn bộ các khối lồng nhau (Nested blocks) dựa trên file responsive.css gốc
+
+// --- Block Nesting 1: Hệ thống Header & Điều hướng (.header) ---
+.header {
+    background: $primary-color;
+    color: $text-light;
+    padding: 1rem;
+    @include flex-layout(space-between, center); // Gọi mixin flex
+
+    .hamburger {
+        font-size: 24px;
+        cursor: pointer;
+
+        @include respond-to("desktop") {
+            display: none; // Ẩn nút ☰ trên desktop
+        }
+    }
+
+    .nav-menu {
+        display: none; // Mặc định ẩn trên mobile
+
+        @include respond-to("desktop") {
+            @include flex-layout(flex-start, center); // Hiện menu ngang trên desktop
+            gap: $spacing-lg;
+
+            a {
+                color: $text-light;
+                text-decoration: none;
+                transition: opacity 0.2s ease;
+
+                &:hover {
+                    opacity: 0.8;
+                }
+            }
+        }
+    }
+}
+
+// --- Block Nesting 2: Khu vực hiển thị cốt lõi (.main-container) ---
+.main-container {
+    display: block; // Mobile-first dạng khối dọc
+
+    @include respond-to("desktop") {
+        display: flex;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .sidebar {
+        display: none; // Mobile: Ẩn
+
+        @include respond-to("tablet") {
+            display: block;
+            padding: $spacing-md;
+            background: $light-bg;
+            border-bottom: 1px solid $border-color;
+        }
+
+        @include respond-to("desktop") {
+            flex: 1;
+            border-right: 1px solid $border-color;
+            border-bottom: none;
+        }
+    }
+
+    // --- Block Nesting 3: Lưới sản phẩm (.product-grid) ---
+    .product-grid {
+        @include grid-layout(1fr, $spacing-md); // 1 cột trên mobile
+        padding: $spacing-md;
+
+        @include respond-to("tablet") {
+            grid-template-columns: repeat(2, 1fr); // 2 cột trên tablet
+        }
+
+        @include respond-to("desktop") {
+            flex: 3;
+            grid-template-columns: repeat(4, 1fr); // 4 cột trên desktop
+        }
+
+        .product-card {
+            border: 1px solid $border-color;
+            padding: $spacing-sm;
+            text-align: center;
+            background: #ffffff;
+
+            img {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+    }
+
+    .ads-bar {
+        display: none; // Mobile & Tablet: Ẩn
+
+        @include respond-to("desktop") {
+            display: block;
+            flex: 1;
+            padding: $spacing-md;
+            background: $ads-bg;
+            border-left: 1px solid $border-color;
+        }
+    }
+}
+
+// Khối Footer chân trang đơn giản
+.footer {
+    background: #eeeeee;
+    text-align: center;
+    padding: $spacing-lg;
+    margin-top: $spacing-lg;
+}
