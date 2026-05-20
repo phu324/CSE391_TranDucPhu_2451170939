@@ -1,0 +1,155 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f0f2f5;
+}
+
+/* --- PHẦN 1: NAVBAR --- */
+.navbar {
+    display: flex;
+    justify-content: space-between; /* Logo trái - Menu giữa - Auth phải */
+    align-items: center; /* Căn giữa theo chiều dọc hoàn hảo */
+    height: 70px;
+    background-color: #ffffff;
+    padding: 0 5%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1a73e8;
+    flex: 1; /* Để logo chiếm 1 phần không gian */
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 30px; /* Các items cách đều nhau */
+    flex: 2;
+    justify-content: center; /* Đưa menu vào giữa */
+}
+
+.nav-menu a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 5px 0;
+}
+
+.nav-menu a:hover {
+    color: #1a73e8;
+    border-bottom: 2px solid #1a73e8; /* Hover: đổi màu + underline */
+}
+
+.nav-auth {
+    display: flex;
+    gap: 15px;
+    flex: 1;
+    justify-content: flex-end; /* Đưa các nút sang phải */
+}
+
+.btn-login, .btn-register {
+    padding: 8px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    font-weight: 600;
+}
+
+.btn-login {
+    background-color: transparent;
+    color: #1a73e8;
+}
+
+.btn-register {
+    background-color: #1a73e8;
+    color: white;
+}
+
+/* --- PHẦN 2: PRODUCT CARDS GRID --- */
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.product-grid {
+    display: flex;
+    flex-wrap: wrap; /* Cho phép rớt dòng */
+    gap: 20px;
+}
+
+.product-card {
+    /* 4 cột: calc(100%/4 - khoảng cách_gap) */
+    flex: 0 0 calc(25% - 15px); 
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column; /* Nội dung bên trong xếp dọc */
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    min-height: 380px;
+}
+
+/* Hiệu ứng hover card */
+.product-card:hover {
+    transform: translateY(-5px); /* Bay lên */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15); /* Tăng bóng đổ */
+}
+
+.card-img {
+    width: 100%;
+    height: 180px;
+    background-color: #e4e6eb;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.card-info h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.price {
+    color: #d93025;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Nút Mua luôn dính đáy card */
+.buy-btn {
+    margin-top: auto; 
+    width: 100%;
+    padding: 12px;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.buy-btn:hover {
+    background-color: #1557b0;
+}
+
+/* Responsive cơ bản cho Mobile/Tablet */
+@media (max-width: 992px) {
+    .product-card { flex: 0 0 calc(50% - 10px); } /* 2 cột trên tablet */
+}
+@media (max-width: 600px) {
+    .product-card { flex: 0 0 100%; } /* 1 cột trên mobile */
+    .navbar { flex-direction: column; height: auto; padding: 15px; }
+    .nav-menu { margin: 15px 0; }
+}
