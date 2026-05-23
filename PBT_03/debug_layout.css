@@ -1,0 +1,55 @@
+/* Reset & Base layout */
+.container {
+    width: 960px;
+    margin: 0 auto;
+    background-color: #f5f5f5;
+}
+
+/* Clearfix để container không bị sập (collapse) do các phần tử con float */
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.sidebar {
+    padding: 20px;
+    border: 1px solid #ff4d4d; /* Đổi màu để dễ nhìn */
+    float: left;
+    background-color: #ffe6e6;
+}
+
+.content {
+    padding: 30px;
+    border: 1px solid #2b7fff; /* Đổi màu để dễ nhìn */
+    float: left;
+    background-color: #e6f2ff;
+}
+
+/* ==========================================
+   CÁCH 1: Dùng border-box
+   ========================================== */
+.fix-way-1 {
+    box-sizing: border-box;
+}
+/* Giữ nguyên width gốc, tổng width = 300 + 660 = 960px */
+.sidebar.fix-way-1 {
+    width: 300px;
+}
+.content.fix-way-1 {
+    width: 660px;
+}
+
+/* ==========================================
+   CÁCH 2: Tính toán thủ công (content-box)
+   ========================================== */
+.fix-way-2 {
+    box-sizing: content-box; /* Ép về mặc định để test */
+}
+/* Đã trừ padding và border vào width */
+.sidebar.fix-way-2 {
+    width: 258px; 
+}
+.content.fix-way-2 {
+    width: 598px;
+}
