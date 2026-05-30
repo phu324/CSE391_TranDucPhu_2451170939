@@ -1,0 +1,156 @@
+:root {
+    --bg-app: #f8fafc;
+    --text-color: #0f172a;
+    --border-color: #cbd5e1;
+    --primary-focus: #2563eb;
+    --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+body.dark-theme {
+    --bg-app: #1e293b;
+    --text-color: #f8fafc;
+    --border-color: #475569;
+    --primary-focus: #60a5fa;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+    background-color: var(--bg-app);
+    color: var(--text-color);
+    padding: 30px;
+    transition: background-color 0.3s;
+}
+
+.app-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Khung hướng dẫn kbd phím tắt */
+.shortcuts-guide {
+    background-color: var(--text-color);
+    color: var(--bg-app);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+.shortcuts-guide h3 { margin-bottom: 10px; }
+.shortcuts-guide ul { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 8px; }
+kbd {
+    background-color: #64748b;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-family: monospace;
+}
+
+/* Focus Management Requirement: Vòng ring hiển thị rõ nét khi di chuyển bằng phím TAB */
+*:focus-visible {
+    outline: 3px solid var(--primary-focus) !important;
+    outline-offset: 3px;
+}
+
+/* Gallery Section */
+.gallery-section h2 { margin-bottom: 20px; text-align: center;}
+.slideshow-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+.control-btn {
+    padding: 10px 20px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-app);
+    color: var(--text-color);
+    cursor: pointer;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+.gallery-item {
+    background-color: var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 3px solid transparent;
+    position: relative;
+    aspect-ratio: 4/3;
+}
+.gallery-item img {
+    width: 100%; height: 100%; object-fit: cover;
+}
+.gallery-item.active {
+    border-color: var(--primary-focus);
+    transform: scale(1.02);
+}
+.img-index-badge {
+    position: absolute;
+    top: 10px; left: 10px;
+    background: rgba(0,0,0,0.7); color: white;
+    padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;
+}
+
+/* Command Palette Overlay Component */
+.palette-overlay, .modal-overlay {
+    position: fixed;
+    top:0; left:0; right:0; bottom:0;
+    background: rgba(0,0,0,0.6);
+    display: flex; justify-content: center; align-items: flex-start;
+    padding-top: 100px; z-index: 1000;
+    display: none; /* Ẩn mặc định */
+}
+.palette-content {
+    background: var(--bg-app);
+    width: 90%; max-width: 550px;
+    border-radius: 8px; box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+#paletteSearch {
+    width: 100%; padding: 15px;
+    font-size: 1.1rem; border: none;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-app); color: var(--text-color);
+    outline: none;
+}
+.command-list { list-style: none; max-height: 250px; overflow-y: auto;}
+.command-item {
+    padding: 12px 15px; cursor: pointer;
+    display: flex; justify-content: space-between;
+    color: var(--text-color);
+}
+.command-item:hover, .command-item.selected {
+    background-color: var(--primary-focus);
+    color: white !important;
+}
+.palette-footer {
+    padding: 10px 15px; font-size: 0.8rem;
+    background: #e2e8f0; color: #475569; text-align: right;
+}
+
+/* Image Lightbox Modal Component */
+.modal-overlay { align-items: center; padding-top: 0; }
+.modal-content {
+    background: var(--bg-app); padding: 20px;
+    border-radius: 10px; position: relative; max-width: 600px; width: 90%;
+}
+.modal-content img { width: 100%; border-radius: 6px; }
+.close-modal {
+    position: absolute; top: -40px; right: 0;
+    background: none; border: none; color: white; font-size: 2rem; cursor: pointer;
+}
+#modalCaption { text-align: center; margin-top: 10px; font-weight: 500; }

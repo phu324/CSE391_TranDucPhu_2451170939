@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Shortcuts & Accessibility — TLU Student</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="shortcuts-guide">
+            <h3>⌨️ Hướng dẫn phím tắt bàn phím:</h3>
+            <ul>
+                <li><kbd>Ctrl</kbd> + <kbd>K</kbd>: Bật/Tắt Menu Lệnh (Command Palette)</li>
+                <li><kbd>←</kbd> <kbd>→</kbd>: Chuyển đổi ảnh kế tiếp / lùi lại trong bộ sưu tập</li>
+                <li><kbd>1</kbd> - <kbd>9</kbd>: Nhảy nhanh tới vị trí ảnh tương ứng</li>
+                <li><kbd>Space (Dấu cách)</kbd>: Bật / Tạm dừng Trình chiếu ảnh (Slideshow)</li>
+                <li><kbd>Esc</kbd>: Đóng nhanh Modal chi tiết hoặc Command Palette</li>
+                <li><kbd>Tab</kbd>: Di chuyển tiêu điểm Focus qua các nút điều khiển</li>
+            </ul>
+        </div>
+
+        <section class="gallery-section">
+            <h2>🖼️ Bộ Sưu Tập Ảnh Tương Tác</h2>
+            <div class="slideshow-controls">
+                <button id="prevBtn" class="control-btn" aria-label="Ảnh trước">◀ Lùi lại</button>
+                <button id="playPauseBtn" class="control-btn" aria-label="Tự động trình chiếu">Trình chiếu: OFF</button>
+                <button id="nextBtn" class="control-btn" aria-label="Ảnh kế tiếp">Kế tiếp ▶</button>
+            </div>
+            
+            <div class="gallery-grid" id="galleryGrid">
+                </div>
+        </section>
+    </div>
+
+    <div id="commandPalette" class="palette-overlay" role="dialog" aria-modal="true" aria-label="Bảng lệnh điều khiển nhanh">
+        <div class="palette-content">
+            <input type="text" id="paletteSearch" placeholder="Gõ từ khóa lệnh (ví dụ: 'nền', 'ảnh', 'xem')..." aria-label="Tìm kiếm lệnh nhanh">
+            <ul id="commandList" class="command-list" role="listbox">
+                </ul>
+            <div class="palette-footer">Bấm <kbd>Enter</kbd> để chạy, <kbd>Esc</kbd> để thoát</div>
+        </div>
+    </div>
+
+    <div id="imageModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Xem ảnh phóng to">
+        <div class="modal-content">
+            <button id="closeModalBtn" class="close-modal" aria-label="Đóng cửa sổ xem ảnh">×</button>
+            <img id="modalImg" src="" alt="Ảnh phóng to chi tiết">
+            <p id="modalCaption"></p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
