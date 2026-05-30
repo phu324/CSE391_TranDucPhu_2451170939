@@ -1,0 +1,198 @@
+:root {
+    --bg-color: #f1f5f9;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --border-normal: #cbd5e1;
+    --color-success: #22c55e;
+    --color-error: #ef4444;
+    --color-warning: #eab308;
+    --primary-disabled: #94a3b8;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.form-container {
+    background-color: var(--card-bg);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    width: 100%;
+    max-width: 450px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #2563eb;
+}
+
+.form-group {
+    margin-bottom: 18px;
+    position: relative;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+input {
+    width: 100%;
+    padding: 10px 40px 10px 12px;
+    border: 1px solid var(--border-normal);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+/* Biểu tượng trạng thái đúng/sai ✅ ❌ */
+.status-icon {
+    position: absolute;
+    right: 12px;
+    font-size: 1rem;
+    pointer-events: none;
+}
+
+/* Định dạng các lớp trạng thái (Valid / Invalid) */
+.form-group.valid input {
+    border-color: var(--color-success);
+    background-color: #f0fdf4;
+}
+.form-group.valid .status-icon::before {
+    content: "✅";
+}
+
+.form-group.invalid input {
+    border-color: var(--color-error);
+    background-color: #fef2f2;
+}
+.form-group.invalid .status-icon::before {
+    content: "❌";
+}
+
+/* Tin nhắn báo lỗi */
+.error-msg {
+    color: var(--color-error);
+    font-size: 0.8rem;
+    margin-top: 4px;
+    display: none;
+}
+.form-group.invalid .error-msg {
+    display: block;
+}
+
+/* Password Strength Meter Component */
+.strength-meter {
+    background-color: #e2e8f0;
+    height: 6px;
+    border-radius: 3px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.strength-bar {
+    width: 0%;
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.strength-text {
+    font-size: 0.8rem;
+    margin-top: 4px;
+    display: block;
+    font-weight: 500;
+}
+
+/* Nút Submit */
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 10px;
+}
+
+button[type="submit"]:hover {
+    background-color: #1d4ed8;
+}
+
+button[type="submit"]:disabled {
+    background-color: var(--primary-disabled);
+    cursor: not-allowed;
+}
+
+/* Modal Popup */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    display: none; /* Ẩn mặc định */
+}
+
+.modal-content {
+    background-color: white;
+    padding: 25px;
+    border-radius: 10px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+}
+
+.modal-content h3 {
+    color: var(--color-success);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#summaryData {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 6px;
+}
+
+#closeModalBtn {
+    width: 100%;
+    padding: 10px;
+    background-color: #64748b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
