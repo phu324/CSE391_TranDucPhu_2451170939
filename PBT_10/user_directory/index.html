@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài B2 - User Directory (CRUD)</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --danger: #dc2626;
+            --success: #16a34a;
+            --gray-100: #f3f4f6;
+            --gray-300: #d1d5db;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+            color: #1e293b;
+        }
+        .app-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h2 { margin-bottom: 20px; }
+        
+        /* Bộ điều khiển (Search + Add) */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .search-input {
+            padding: 10px 16px;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            width: 300px;
+            font-size: 15px;
+        }
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-secondary { background: #64748b; color: white; }
+        
+        /* Form Khu vực nhập liệu */
+        .form-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+        }
+        .hidden { display: none !important; }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        /* Danh sách người dùng (Grid + Card) */
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .user-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #edf2f7;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .user-info h3 { margin: 0 0 8px 0; color: #0f172a; }
+        .user-info p { margin: 4px 0; color: #475569; font-size: 14px; }
+        .card-actions {
+            margin-top: 16px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 12px;
+        }
+
+        /* Hiệu ứng Skeleton Loader */
+        .skeleton-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            height: 150px;
+            border: 1px solid #edf2f7;
+        }
+        .skeleton-line {
+            height: 16px;
+            background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+            background-size: 200% 100%;
+            animation: loading-skeleton 1.5s infinite;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+        .skeleton-line.title { width: 60%; height: 22px; }
+        .skeleton-line.text-1 { width: 85%; }
+        .skeleton-line.text-2 { width: 40%; }
+        @keyframes loading-skeleton {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Hệ thống Toast Alerts */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 12px 24px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            animation: slideIn 0.3s ease-out;
+        }
+        .toast-success { background: var(--success); }
+        .toast-error { background: var(--danger); }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <div class="app-container">
+        <h2>👥 Hệ thống quản lý thành viên (User Directory)</h2>
+
+        <div class="controls">
+            <input type="text" id="search-bar" class="search-input" placeholder="🔍 Tìm theo tên hoặc email...">
+            <button class="btn btn-primary" id="btn-open-add">➕ Thêm thành viên</button>
+        </div>
+
+        <div class="form-section hidden" id="form-block">
+            <h3 id="form-title">Thêm thành viên mới</h3>
+            <form id="user-form">
+                <input type="hidden" id="form-user-id">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Họ và tên</label>
+                        <input type="text" id="input-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="input-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Điện thoại</label>
+                        <input type="text" id="input-phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tên công ty</label>
+                        <input type="text" id="input-company" required>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button type="submit" class="btn btn-primary" id="btn-submit-form">Lưu dữ liệu</button>
+                    <button type="button" class="btn btn-secondary" id="btn-cancel-form">Hủy bỏ</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="user-grid" id="user-display-container"></div>
+    </div>
+
+    <script>
+        // State biến cục bộ lưu trữ dữ liệu ứng dụng hiện tại (Local State)
+        let localUsers = [];
+
+        // ==========================================
+        // 🚀 LAYER 1: API LAYER (Xử lý Network Requests)
+        // ==========================================
+        const api = {
+            baseURL: "https://jsonplaceholder.typicode.com",
+            
+            async _request(endpoint, options = {}) {
+                const response = await fetch(`${this.baseURL}${endpoint}`, {
+                    headers: { "Content-Type": "application/json" },
+                    ...options
+                });
+                if (!response.ok) {
+                    throw new Error(`Yêu cầu máy chủ thất bại (HTTP ${response.status})`);
+                }
+                return response.json();
+            },
+
+            async getUsers() { 
+                return this._request("/users"); 
+            },
+            
+            async getUser(id) { 
+                return this._request(`/users/${id}`); 
+            },
+            
+            async createUser(data) { 
+                return this._request("/users", {
+                    method: "POST",
+                    body: JSON.stringify(data)
+                });
+            },
+            
+            async updateUser(id, data) { 
+                return this._request(`/users/${id}`, {
+                    method: "PUT",
+                    body: JSON.stringify(data)
+                });
+            },
+            
+            async deleteUser(id) { 
+                // JSONPlaceholder không thực sự xóa vật lý trên db nên ta dùng method DELETE bình thường
+                return this._request(`/users/${id}`, { method: "DELETE" });
+            }
+        };
+
+        // ==========================================
+        // 🎨 LAYER 2: UI LAYER (Xử lý giao diện & Đổ dữ liệu)
+        // ==========================================
+        const ui = {
+            container: document.getElementById('user-display-container'),
+            toastContainer: document.getElementById('toast-container'),
+
+            renderUsers(users) {
+                this.container.innerHTML = '';
+                if(users.length === 0) {
+                    this.container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #64748b;">📭 Không tìm thấy thành viên phù hợp.</p>';
+                    return;
+                }
+
+                users.forEach(user => {
+                    const card = document.createElement('div');
+                    card.className = 'user-card';
+                    // Đọc an toàn cấu trúc lồng nhau phòng khi tạo mới cấu trúc object phẳng
+                    const companyName = user.company?.name || user.company || 'N/A'; 
+                    
+                    card.innerHTML = `
+                        <div class="user-info">
+                            <h3>${user.name}</h3>
+                            <p>📧 Email: ${user.email}</p>
+                            <p>📞 SĐT: ${user.phone}</p>
+                            <p>🏢 Công ty: ${companyName}</p>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;" onclick="handleEditBtnClick(${user.id})">✏️ Sửa</button>
+                            <button class="btn btn-danger" style="padding: 6px 12px; font-size: 13px;" onclick="handleDeleteBtnClick(${user.id})">🗑️ Xóa</button>
+                        </div>
+                    `;
+                    this.container.appendChild(card);
+                });
+            },
+
+            showLoading() {
+                this.container.innerHTML = '';
+                // Render ra 6 khối skeleton giả lập khung dữ liệu
+                for (let i = 0; i < 6; i++) {
+                    this.container.innerHTML += `
+                        <div class="skeleton-card">
+                            <div class="skeleton-line title"></div>
+                            <div class="skeleton-line text-1"></div>
+                            <div class="skeleton-line text-2"></div>
+                        </div>
+                    `;
+                }
+            },
+
+            hideLoading() {
+                // Hàm renderUsers chạy sau đó sẽ tự động xóa sạch vùng container
+            },
+
+            showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type}`;
+                toast.textContent = message;
+                this.toastContainer.appendChild(toast);
+                // Tự biến mất sau 3 giây
+                setTimeout(() => toast.remove(), 3000);
+            },
+
+            showError(message) {
+                this.showToast(`❌ Lỗi: ${message}`, 'error');
+            },
+
+            showSuccess(message) {
+                this.showToast(`✅ Thành công: ${message}`, 'success');
+            }
+        };
+
+        // ==========================================
+        // 🕹️ LAYER 3: APP LOGIC CONTROLLER (Điều phối sự kiện)
+        // ==========================================
+        
+        // DOM Elements cho việc điều khiển form
+        const formBlock = document.getElementById('form-block');
+        const formTitle = document.getElementById('form-title');
+        const userForm = document.getElementById('user-form');
+        const searchBar = document.getElementById('search-bar');
+
+        // 1. Khởi chạy - Tải dữ liệu ban đầu (READ)
+        async function initApp() {
+            ui.showLoading();
+            try {
+                localUsers = await api.getUsers();
+                ui.renderUsers(localUsers);
+            } catch (error) {
+                ui.showError(error.message);
+            }
+        }
+
+        // 2. Chức năng Tìm kiếm Client-side (SEARCH Filter)
+        searchBar.addEventListener('input', (e) => {
+            const keyword = e.target.value.toLowerCase().trim();
+            const filtered = localUsers.filter(user => 
+                user.name.toLowerCase().includes(keyword) || 
+                user.email.toLowerCase().includes(keyword)
+            );
+            ui.renderUsers(filtered);
+        });
+
+        // 3. Đóng mở và thiết lập Form
+        document.getElementById('btn-open-add').addEventListener('click', () => {
+            formBlock.classList.remove('hidden');
+            formTitle.textContent = "Thêm thành viên mới";
+            userForm.reset();
+            document.getElementById('form-user-id').value = '';
+            formBlock.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        document.getElementById('btn-cancel-form').addEventListener('click', () => {
+            formBlock.classList.add('hidden');
+            userForm.reset();
+        });
+
+        // 4. Xử lý nộp biểu mẫu (Xử lý tích hợp CREATE & UPDATE)
+        userForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const id = document.getElementById('form-user-id').value;
+            const userData = {
+                name: document.getElementById('input-name').value,
+                email: document.getElementById('input-email').value,
+                phone: document.getElementById('input-phone').value,
+                company: document.getElementById('input-company').value
+            };
+
+            if (id) {
+                // ─── ĐOẠN XỬ LÝ UPDATE ───
+                try {
+                    const result = await api.updateUser(id, userData);
+                    // Cập nhật dữ liệu ngay tại mảng cục bộ (Không reload trang)
+                    const index = localUsers.findIndex(u => u.id == id);
+                    if (index !== -1) {
+                        localUsers[index] = { ...localUsers[index], ...result };
+                    }
+                    ui.renderUsers(localUsers);
+                    ui.showSuccess("Cập nhật thông tin thành viên thành công!");
+                    formBlock.classList.add('hidden');
+                } catch (error) {
+                    ui.showError(error.message);
+                }
+            } else {
+                // ─── ĐOẠN XỬ LÝ CREATE ───
+                try {
+                    const newIdFake = localUsers.length > 0 ? Math.max(...localUsers.map(u=>u.id)) + 1 : 11;
+                    const result = await api.createUser(userData);
+                    // Gán ID ảo tăng dần do API giả định luôn trả về ID 11
+                    result.id = newIdFake; 
+                    
+                    localUsers.unshift(result); // Đẩy lên đầu danh sách hiển thị
+                    ui.renderUsers(localUsers);
+                    ui.showSuccess("Thêm thành viên mới thành công!");
+                    formBlock.classList.add('hidden');
+                } catch (error) {
+                    ui.showError(error.message);
+                }
+            }
+        });
+
+        // 5. Kích hoạt nút bấm sửa (Đổ dữ liệu cũ lên Form)
+        async function handleEditBtnClick(userId) {
+            formBlock.classList.remove('hidden');
+            formTitle.textContent = "Chỉnh sửa thông tin thành viên";
+            
+            // Tìm nhanh đối tượng trong local state, nếu cấu trúc sâu thì lấy trực tiếp từ API
+            const user = localUsers.find(u => u.id == userId);
+            if (!user) return;
+
+            document.getElementById('form-user-id').value = user.id;
+            document.getElementById('input-name').value = user.name;
+            document.getElementById('input-email').value = user.email;
+            document.getElementById('input-phone').value = user.phone;
+            document.getElementById('input-company').value = user.company?.name || user.company || '';
+
+            formBlock.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 6. Xử lý tác vụ xóa thành viên (DELETE)
+        async function handleDeleteBtnClick(userId) {
+            const targetUser = localUsers.find(u => u.id == userId);
+            const userName = targetUser ? targetUser.name : "thành viên này";
+
+            // Hiển thị hộp thoại xác nhận bắt buộc trước khi thực thi
+            if (confirm(`Bạn có chắc chắn muốn xóa thành viên "${userName}" ra khỏi hệ thống?`)) {
+                try {
+                    await api.deleteUser(userId);
+                    // Xóa thành công trên API, tiến hành lọc bỏ trong mảng local
+                    localUsers = localUsers.filter(u => u.id != userId);
+                    ui.renderUsers(localUsers);
+                    ui.showSuccess(`Đã xóa thành công thành viên "${userName}"!`);
+                } catch (error) {
+                    ui.showError(error.message);
+                }
+            }
+        }
+
+        // Kích hoạt chạy ứng dụng
+        initApp();
+    </script>
+</body>
+</html>
