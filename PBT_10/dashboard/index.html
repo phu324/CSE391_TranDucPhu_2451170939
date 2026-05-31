@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài B4 - Multi-API Dashboard</title>
+    <style>
+        :root {
+            --bg-main: #f1f5f9;
+            --primary: #0f172a;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-main);
+            color: #334155;
+            margin: 0;
+            padding: 24px;
+        }
+        .header {
+            max-width: 1200px;
+            margin: 0 auto 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .header h1 { margin: 0; font-size: 24px; color: var(--primary); }
+        
+        .controls { display: flex; align-items: center; gap: 16px; }
+        .timer { font-size: 14px; color: #64748b; font-weight: 500; }
+        
+        .btn-refresh {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-refresh:hover { opacity: 0.9; }
+
+        /* 📊 Layout Dashboard 3 Cột */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        @media (max-width: 1024px) {
+            .dashboard-grid { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        }
+
+        /* Khung giao diện Widget */
+        .widget {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            min-height: 250px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .widget-title {
+            margin: 0 0 16px 0;
+            font-size: 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--bg-main);
+            color: var(--primary);
+        }
+        .widget-content { flex: 1; }
+
+        /* 🔄 Trạng thái Loading / Error / Success riêng lẻ */
+        .widget-loading {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--accent);
+            font-weight: 500;
+        }
+        .spinner {
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 8px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .widget-error {
+            background-color: #fef2f2;
+            color: var(--error);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid #fee2e2;
+        }
+        .hidden { display: none !important; }
+
+        /* CSS phụ trợ hiển thị dữ liệu Widget cụ thể */
+        .user-box { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .user-box img { width: 50px; height: 50px; border-radius: 50%; background: #e2e8f0; }
+        .dog-img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; }
+        .crypto-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #e2e8f0; }
+        .crypto-price { font-weight: bold; color: var(--success); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>📊 Tổng Hợp Dữ Liệu Real-time</h1>
+        <div class="controls">
+            <span class="timer" id="load-timer">Đang kết nối hệ thống...</span>
+            <button class="btn-refresh" id="btn-refresh">🔄 Refresh All</button>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+
+        <div class="widget" id="widget-0">
+            <h3 class="widget-title">👥 Thành Viên Mới</h3>
+            <div class="widget-content" id="content-0"></div>
+            <div class="widget-loading" id="loading-0"><div class="spinner"></div>Đang cập nhật...</div>
+        </div>
+
+        <div class="widget" id="widget-1">
+            <h3 class="widget-title">🐶 Thú Cưng Ngẫu Nhiên</h3>
+            <div class="widget-content" id="content-1"></div>
+            <div class="widget-loading" id="loading-1"><div class="spinner"></div>Đang cập nhật...</div>
+        </div>
+
+        <div class="widget" id="widget-2">
+            <h3 class="widget-title">🪙 Tỷ Giá Tiền Số (USD)</h3>
+            <div class="widget-content" id="content-2"></div>
+            <div class="widget-loading" id="loading-2"><div class="spinner"></div>Đang cập nhật...</div>
+        </div>
+
+    </div>
+
+    <script>
+        // DOM Elements
+        const btnRefresh = document.getElementById('btn-refresh');
+        const loadTimer = document.getElementById('load-timer');
+
+        // Định nghĩa 3 APIs ổn định và chạy độc lập
+        const API_URLS = [
+            "https://randomuser.me/api/?results=2", // API 1: Lấy thông tin user
+            "https://dog.ceo/api/breeds/image/random", // API 2: Lấy ảnh cún ngẫu nhiên
+            "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,cardano&vs_currencies=usd" // API 3: Lấy giá Coin
+        ];
+
+        // ==========================================
+        // 🔄 Hàm xử lý bọc hàm Fetch an toàn giúp bóc tách lỗi JSON
+        // ==========================================
+        async function fetchJSON(url) {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Mã lỗi máy chủ HTTP ${response.status}`);
+            }
+            return response.json();
+        }
+
+        // ==========================================
+        // 🚀 Hàm điều phối chính chạy song song nhiều API bằng Promise.allSettled()
+        // ==========================================
+        async function loadDashboard() {
+            const startTime = Date.now(); // Ghi nhận thời điểm bắt đầu request
+            
+            // Kích hoạt hiển thị màn hình Loading tổng thể cho toàn bộ các widget
+            showAllLoadings();
+
+            // Chạy song song cả 3 APIs, không chặn đứng lẫn nhau
+            const results = await Promise.allSettled([
+                fetchJSON(API_URLS[0]),
+                fetchJSON(API_URLS[1]),
+                fetchJSON(API_URLS[2])
+            ]);
+            
+            // Duyệt kết quả sau khi tất cả các API đã trả về trạng thái cuối cùng (thành công hoặc thất bại)
+            results.forEach((result, index) => {
+                hideLoading(index); // Tắt màn hình chờ riêng lẻ của widget đó
+
+                if (result.status === "fulfilled") {
+                    // Nếu API này tải thành công -> Tiến hành đổ dữ liệu lên widget tương ứng
+                    renderWidget(index, result.value);
+                } else {
+                    // Nếu API này bị gãy -> Chỉ hiển thị lỗi tại duy nhất ô widget đó, các ô khác không bị ảnh hưởng
+                    renderWidgetError(index, result.reason.message);
+                }
+            });
+            
+            // Tính toán khoảng thời gian tải bằng mili-giây (ms)
+            const duration = Date.now() - startTime;
+            loadTimer.textContent = `⚡ Dữ liệu đồng bộ trong: ${duration} ms`;
+        }
+
+        // ==========================================
+        // 🎨 Các hàm render dữ liệu giao diện Widget
+        // ==========================================
+        function renderWidget(index, data) {
+            const container = document.getElementById(`content-${index}`);
+            container.innerHTML = ''; // Làm sạch dữ liệu cũ trước khi nạp mới
+
+            // Khối điều phối logic đổ dữ liệu tùy thuộc vào cấu trúc của từng API
+            if (index === 0) {
+                // Widget 1: Xử lý hiển thị 2 Random Users
+                data.results.forEach(user => {
+                    container.innerHTML += `
+                        <div class="user-box">
+                            <img src="${user.picture.medium}" alt="Avatar">
+                            <div>
+                                <strong style="color: #0f172a;">${user.name.first} ${user.name.last}</strong><br>
+                                <span style="font-size: 13px; color:#64748b;">📍 ${user.location.country}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            } 
+            else if (index === 1) {
+                // Widget 2: Xử lý hiển thị Dog Image
+                container.innerHTML = `<img class="dog-img" src="${data.message}" alt="Random Dog">`;
+            } 
+            else if (index === 2) {
+                // Widget 3: Xử lý hiển thị tỷ giá tiền mã hóa từ CoinGecko
+                container.innerHTML = `
+                    <div class="crypto-item"><span>Bitcoin (BTC):</span> <span class="crypto-price">$${data.bitcoin.usd.toLocaleString()}</span></div>
+                    <div class="crypto-item"><span>Ethereum (ETH):</span> <span class="crypto-price">$${data.ethereum.usd.toLocaleString()}</span></div>
+                    <div class="crypto-item"><span>Cardano (ADA):</span> <span class="crypto-price">$${data.cardano.usd.toLocaleString()}</span></div>
+                `;
+            }
+        }
+
+        // Hàm dựng thông báo lỗi cô lập trên từng Widget
+        function renderWidgetError(index, errorMessage) {
+            const container = document.getElementById(`content-${index}`);
+            container.innerHTML = `
+                <div class="widget-error">
+                    <strong>⚠️ Khởi tạo thất bại</strong>
+                    <p style="margin: 4px 0 0 0; font-size: 13px;">Chi tiết: ${errorMessage || "Không thể tải dữ liệu từ máy chủ API này."}</p>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // 🛠️ Quản lý trạng thái hiển thị của các khối Loading hiệu ứng
+        // ==========================================
+        function showAllLoadings() {
+            for (let i = 0; i < API_URLS.length; i++) {
+                document.getElementById(`loading-${i}`).classList.remove('hidden');
+            }
+        }
+
+        function hideLoading(index) {
+            document.getElementById(`loading-${index}`).classList.add('hidden');
+        }
+
+        // Lắng nghe sự kiện click nút làm mới "Refresh All" để gọi lại toàn bộ các API
+        btnRefresh.addEventListener('click', loadDashboard);
+
+        // Tự động kích hoạt chạy ứng dụng ngay khi mở trang web
+        loadDashboard();
+    </script>
+</body>
+</html>
