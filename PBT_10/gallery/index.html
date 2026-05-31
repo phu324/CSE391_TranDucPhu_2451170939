@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài B3 - Infinite Scroll Gallery</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+        }
+        h2 { text-align: center; margin-bottom: 24px; color: #38bdf8; }
+
+        /* 📐 Grid Responsive: 4 cột desktop, 2 cột tablet, 1 cột mobile */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr)); /* Desktop mặc định */
+            gap: 16px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        @media (max-width: 1024px) {
+            .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } /* Tablet */
+        }
+        @media (max-width: 640px) {
+            .gallery-grid { grid-template-columns: repeat(1, minmax(0, 1fr)); } /* Mobile */
+        }
+
+        /* Khung chứa ảnh */
+        .gallery-item {
+            background-color: #1e293b;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1 / 1;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .gallery-item:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 15px -3px rgba(56, 189, 248, 0.2);
+        }
+
+        /* Kỹ thuật Lazy Loading Images */
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0; /* Mặc định ẩn để làm hiệu ứng fade-in khi load xong */
+            transition: opacity 0.3s ease-in-out;
+        }
+        .gallery-item img.loaded {
+            opacity: 1;
+        }
+
+        /* 🔄 Indicator "Đang tải thêm..." ở đáy trang */
+        .loading-indicator {
+            text-align: center;
+            padding: 30px;
+            font-size: 16px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        .spinner {
+            border: 3px solid #334155;
+            border-top: 3px solid #38bdf8;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 8px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .hidden { display: none !important; }
+
+        /* 🖼️ Lightbox Modal hiển thị ảnh lớn */
+        .lightbox {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(15, 23, 42, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .lightbox.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .lightbox-content {
+            max-width: 85%;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 20px; right: 30px;
+            font-size: 40px;
+            color: #f8fafc;
+            cursor: pointer;
+            user-select: none;
+        }
+        .lightbox-close:hover { color: #38bdf8; }
+    </style>
+</head>
+<body>
+
+    <h2>🌌 Bộ Sưu Tập Ảnh Vô Tận (Infinite Scroll)</h2>
+
+    <div class="gallery-grid" id="gallery-container"></div>
+
+    <div id="load-trigger" class="loading-indicator">
+        <div class="spinner"></div>
+        <p>Đang tải thêm ảnh...</p>
+    </div>
+
+    <div id="lightbox-modal" class="lightbox">
+        <span class="lightbox-close" id="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightbox-img" src="" alt="Dữ liệu ảnh lớn">
+    </div>
+
+    <script>
+        // DOM Elements
+        const galleryContainer = document.getElementById('gallery-container');
+        const loadTrigger = document.getElementById('load-trigger');
+        const lightboxModal = document.getElementById('lightbox-modal');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxClose = document.getElementById('lightbox-close');
+
+        // Quản lý trạng thái phân trang (Pagination State)
+        let currentPage = 1;
+        const limit = 20;
+        let isFetching = false; // Cờ chặn việc gọi trùng lặp nhiều request cùng lúc khi scroll nhanh
+
+        // ==========================================
+        // 🔄 1. Hàm chính: Gọi API lấy dữ liệu ảnh (Dùng Lorem Picsum)
+        // ==========================================
+        async function loadMorePhotos() {
+            if (isFetching) return; // Nếu đang chạy request trước đó thì bỏ qua
+            isFetching = true;
+            loadTrigger.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`https://picsum.photos/v2/list?page=${currentPage}&limit=${limit}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Lỗi kết nối API (HTTP ${response.status})`);
+                }
+
+                const photos = await response.json();
+
+                if (photos.length === 0) {
+                    // Nếu API không còn ảnh nào để trả về
+                    loadTrigger.innerHTML = "<p>🎉 Bạn đã xem hết tất cả các ảnh!</p>";
+                    infiniteObserver.unobserve(loadTrigger); // Ngắt kết nối theo dõi luôn
+                    return;
+                }
+
+                // Tiến hành dựng giao diện cho khối ảnh vừa nhận về
+                renderPhotos(photos);
+                currentPage++; // Tăng số trang lên chuẩn bị cho lần scroll kế tiếp
+
+            } catch (error) {
+                console.error("Lỗi khi tải ảnh:", error.message);
+            } finally {
+                isFetching = false;
+                // Nếu kết quả load nhanh quá, ta giữ lại loading xíu để tạo cảm giác mượt mà
+                setTimeout(() => {
+                    if(isFetching === false) loadTrigger.classList.add('hidden');
+                }, 400);
+            }
+        }
+
+        // ==========================================
+        // 🎨 2. Hàm đổ dữ liệu lên UI & Gán Logic Lazy Loading
+        // ==========================================
+        function renderPhotos(photos) {
+            photos.forEach(photo => {
+                // Tạo thẻ bọc Item
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+
+                // Tạo thẻ ảnh img nhưng CHƯA GÁN thuộc tính 'src' ngay
+                // Thay vào đó lưu tạm URL thực tế vào attribute 'data-src' để tối ưu lazy loading
+                const img = document.createElement('img');
+                img.setAttribute('data-src', `https://picsum.photos/id/${photo.id}/400/400`);
+                img.alt = `Photo by ${photo.author}`;
+
+                // Khi ảnh thật được tải xong thì add class 'loaded' để chạy hiệu ứng opacity mượt mà
+                img.addEventListener('load', () => img.classList.add('loaded'));
+
+                // Sự kiện click ảnh => Mở Lightbox Modal hiển thị ảnh chất lượng cao kích thước lớn hơn
+                item.addEventListener('click', () => {
+                    openLightbox(`https://picsum.photos/id/${photo.id}/1000/800`);
+                });
+
+                item.appendChild(img);
+                galleryContainer.appendChild(item);
+
+                // Đưa thẻ ảnh img này vào hệ thống giám sát Lazy Load
+                lazyImageObserver.observe(img);
+            });
+        }
+
+        // ==========================================
+        // 👀 3. Thiết lập IntersectionObserver cho Infinite Scroll
+        // ==========================================
+        const infiniteObserver = new IntersectionObserver((entries) => {
+            // entries[0] chính là phần tử '#load-trigger' dưới đáy trang
+            if (entries[0].isIntersecting && !isFetching) {
+                loadMorePhotos(); // Người dùng scroll gần chạm đáy -> Tự động load 20 ảnh tiếp
+            }
+        }, {
+            rootMargin: '150px' // Cho phép kích hoạt tải trước khi người dùng thực sự chạm đáy 150px để trải nghiệm liền mạch
+        });
+
+        // Bắt đầu theo dõi phần tử trigger ở cuối trang
+        infiniteObserver.observe(loadTrigger);
+
+        // ==========================================
+        // 📷 4. Thiết lập IntersectionObserver cho Lazy Loading Images
+        // ==========================================
+        const lazyImageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    // Lấy URL từ kho tạm 'data-src' nạp vào 'src' chính thức để trình duyệt bắt đầu tải
+                    img.src = img.getAttribute('data-src');
+                    // Ảnh đã hiển thị và được tải, không cần giám sát phần tử này nữa nhằm giải phóng bộ nhớ
+                    observer.unobserve(img);
+                }
+            });
+        });
+
+        // ==========================================
+        // 🖼️ 5. Quản lý Đóng/Mở Lightbox Modal
+        // ==========================================
+        function openLightbox(highResUrl) {
+            lightboxImg.src = highResUrl;
+            lightboxModal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Khóa thanh cuộn trang chính khi đang xem ảnh to
+        }
+
+        function closeLightbox() {
+            lightboxModal.classList.remove('active');
+            lightboxImg.src = ''; // Clear ảnh cũ tránh hiện tượng nháy ảnh cũ cho lần mở sau
+            document.body.style.overflow = ''; // Mở lại thanh cuộn
+        }
+
+        // Đóng khi ấn nút X hoặc ấn trượt ra ngoài vùng ảnh
+        lightboxClose.addEventListener('click', closeLightbox);
+        lightboxModal.addEventListener('click', (e) => {
+            if (e.target === lightboxModal) closeLightbox();
+        });
+
+        // Đóng khi người dùng bấm phím Escape (ESC) trên bàn phím
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+</body>
+</html>
